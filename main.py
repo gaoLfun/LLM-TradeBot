@@ -5862,8 +5862,14 @@ def start_server():
     import os
     port = int(os.getenv("PORT", 8000))
     is_railway = bool(os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("RAILWAY_PROJECT_ID"))
-    is_production = is_railway or os.getenv("DEPLOYMENT_MODE", "local") != "local"
-    host = "0.0.0.0" if is_production else os.getenv("HOST", "127.0.0.1")
+    deployment_mode = os.getenv("DEPLOYMENT_MODE", "local").lower()
+    
+    # Railway 或 Docker 部署时绑定 0.0.0.0，本地开发绑定 127.0.0.1
+    if is_railway or deployment_mode in ('docker', 'production', 'railway', 'cloud'):
+        host = "0.0.0.0"
+    else:
+        host = os.getenv("HOST", "127.0.0.1")
+    
     print(f"\n🌍 Starting Web Dashboard at http://{host}:{port}")
     uvicorn.run(app, host=host, port=port, log_level="error")
 

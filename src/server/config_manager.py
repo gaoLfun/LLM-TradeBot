@@ -1,5 +1,6 @@
 import os
 import re
+import json
 from typing import Dict, Any, Optional
 
 class ConfigManager:
@@ -11,9 +12,15 @@ class ConfigManager:
         self.env_path = os.path.join(root_dir, '.env')
         self.config_dir = os.path.join(root_dir, 'config')
         self.prompt_path = os.path.join(self.config_dir, 'custom_prompt.md')
+        self.data_dir = os.path.join(root_dir, 'data')
+        self.runtime_config_path = os.path.join(self.data_dir, 'runtime_config.json')
         
         # Check if running on Railway
         self.is_railway = bool(os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("RAILWAY_PROJECT_ID"))
+        # Check if running in Docker (cannot write to .env)
+        self.is_docker = os.environ.get("DEPLOYMENT_MODE", "").lower() in ("docker", "production", "cloud")
+        # Cannot write .env in Docker or Railway (read-only filesystem)
+        self.can_write_env = not self.is_docker and not self.is_railway
         
     def get_config(self) -> Dict[str, Any]:
         """Read config from .env and return structured dict"""
@@ -27,6 +34,17 @@ class ConfigManager:
                     if '=' in line:
                         key, val = line.split('=', 1)
                         env_vars[key.strip()] = val.strip()
+        
+        # In Docker/Railway, merge with runtime config (takes priority)
+        runtime_vars = {}
+        if self.is_docker or self.is_railway:
+            if os.path.exists(self.runtime_config_path):
+                try:
+                    with open(self.runtime_config_path, 'r', encoding='utf-8') as f:
+                        runtime_vars = json.load(f)
+                        env_vars.update(runtime_vars)  # Runtime config overrides .env
+                except Exception:
+                    pass
         
         # Structure for Frontend
         return {
@@ -94,12 +112,34 @@ class ConfigManager:
                     self._update_agents_config(agents_update)
                 return True  # Nothing else to update
             
-            # === Railway Mode: Apply to runtime environment ===
-            if railway_mode or self.is_railway:
+            # === Railway/Docker Mode: Save to runtime_config.json ===
+            if railway_mode or self.is_railway or self.is_docker:
+                # Ensure data directory exists
+                os.makedirs(self.data_dir, exist_ok=True)
+                
+                # Load existing runtime config
+                runtime_config = {}
+                if os.path.exists(self.runtime_config_path):
+                    try:
+                        with open(self.runtime_config_path, 'r', encoding='utf-8') as f:
+                            runtime_config = json.load(f)
+                    except Exception:
+                        pass
+                
+                # Update with new values
+                runtime_config.update(flat_updates)
+                
+                # Save to runtime_config.json
+                try:
+                    with open(self.runtime_config_path, 'w', encoding='utf-8') as f:
+                        json.dump(runtime_config, f, indent=2)
+                    print(f"[ConfigManager] Runtime config saved to: {self.runtime_config_path}")
+                except Exception as e:
+                    print(f"[ConfigManager] Warning: Could not save runtime config: {e}")
+                
+                # Also apply to runtime memory
                 for key, val in flat_updates.items():
-                    # Store in runtime config
                     ConfigManager._runtime_config[key] = val
-                    # Also apply to os.environ for immediate effect
                     os.environ[key] = val
                 
                 # Signal to main loop that config has changed
@@ -108,14 +148,13 @@ class ConfigManager:
                     global_state.config_changed = True
                 except Exception as e:
                     print(f"[ConfigManager] Warning: Could not set config_changed flag: {e}")
-                # Reload runtime config (same process)
                 try:
                     from src.config import config
                     config._load_config()
                 except Exception as e:
                     print(f"[ConfigManager] Warning: Could not reload config: {e}")
                 
-                print(f"[ConfigManager] Runtime config applied (Railway mode): {list(flat_updates.keys())}")
+                print(f"[ConfigManager] Runtime config applied (Docker/Railway mode): {list(flat_updates.keys())}")
                 return True
             
             # === Local Mode: Update .env file ===
