@@ -19,7 +19,7 @@ class SharedState:
     # Cycle Tracking
     cycle_counter: int = 0  # Total number of cycles since start
     current_cycle_id: str = ""  # Current cycle identifier (cycle_NNNN_timestamp)
-    cycle_interval: int = 3  # Cycle interval in minutes (default 3)
+    cycle_interval: int = 5  # Cycle interval in minutes (default 5)
     cycle_positions_opened: int = 0  # Positions opened in current cycle
     symbols: List[str] = field(default_factory=list)  # 🆕 Active trading symbols (supports AI500 Top5)
     current_symbol: str = ""  # 🆕 Symbol currently being analyzed

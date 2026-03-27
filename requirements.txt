@@ -18,7 +18,12 @@ openai==1.6.1
 # 数据存储
 redis==5.0.1
 sqlalchemy==2.0.23
-psycopg2-binary==2.9.9
+
+# Parquet 支持（K线缓存）
+pyarrow>=14.0.0
+
+# HTTP 客户端（LLM 调用）
+httpx>=0.25.0
 
 # 配置管理
 pyyaml==6.0.1

@@ -12,6 +12,7 @@ import httpx
 import time
 
 from src.llm.metrics import record_error, record_request, record_success
+from src.utils.logger import log
 import re
 
 
@@ -70,7 +71,12 @@ class BaseLLMClient(ABC):
         self.config = config
         self.base_url = config.base_url or self.DEFAULT_BASE_URL
         self.model = config.model or self.DEFAULT_MODEL
-        self.client = httpx.Client(timeout=config.timeout)
+        # 禁用自动重定向，避免 HTTPS 被重定向到不安全的 HTTP（如 MiniMax 301 重定向问题）
+        self.client = httpx.Client(
+            timeout=config.timeout,
+            follow_redirects=False,
+            limits=httpx.Limits(max_keepalive_connections=20, max_connections=100)
+        )
     
     @abstractmethod
     def _build_headers(self) -> Dict[str, str]:
@@ -93,7 +99,7 @@ class BaseLLMClient(ABC):
     
     def _build_url(self) -> str:
         """构建请求 URL"""
-        return f"{self.base_url}/chat/completions"
+        return f"{self.base_url}"
     
     def _messages_to_list(self, messages: List[ChatMessage]) -> List[Dict[str, str]]:
         """将 ChatMessage 列表转换为字典列表"""
@@ -188,7 +194,7 @@ class BaseLLMClient(ABC):
                 if e.response.status_code in [429, 500, 502, 503, 504]:
                     # 可重试的 HTTP 错误
                     wait_time = 2 ** attempt
-                    print(f"⚠️ LLM HTTP Error {e.response.status_code}, retrying in {wait_time}s (attempt {attempt + 1}/{self.config.max_retries})")
+                    log.warning(f"LLM HTTP Error {e.response.status_code}, retrying in {wait_time}s (attempt {attempt + 1}/{self.config.max_retries})")
                     time.sleep(wait_time)
                     continue
                 raise
@@ -198,7 +204,7 @@ class BaseLLMClient(ABC):
                 last_error = e
                 record_error(self.PROVIDER, self.model, type(e).__name__)
                 wait_time = 2 ** attempt
-                print(f"⚠️ LLM Connection Error: {type(e).__name__}, retrying in {wait_time}s (attempt {attempt + 1}/{self.config.max_retries})")
+                log.warning(f"LLM Connection Error: {type(e).__name__}, retrying in {wait_time}s (attempt {attempt + 1}/{self.config.max_retries})")
                 time.sleep(wait_time)
                 continue
             except Exception as e:
@@ -207,7 +213,7 @@ class BaseLLMClient(ABC):
                 # 其他未知错误，最后一次尝试后抛出
                 if attempt < self.config.max_retries - 1:
                     wait_time = 2 ** attempt
-                    print(f"⚠️ LLM Unexpected Error: {type(e).__name__}: {e}, retrying in {wait_time}s")
+                    log.warning(f"LLM Unexpected Error: {type(e).__name__}: {e}, retrying in {wait_time}s")
                     time.sleep(wait_time)
                     continue
                 raise

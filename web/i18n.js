@@ -15,6 +15,40 @@ const i18n = {
         'btn.pause': 'Pause Trading',
         'btn.stop': 'Stop System',
 
+        // Mode Toggle
+        'mode.test': '🧪 Test',
+        'mode.test.title': 'Test Mode - No Real Trading',
+        'mode.live': '💰 Live',
+        'mode.live.title': 'Live Mode - Real Trading',
+
+        // Control Buttons
+        'btn.start.title': 'Start Trading',
+        'btn.pause.title': 'Pause Trading',
+        'btn.stop.title': 'Stop System',
+
+        // Cycle Interval
+        'interval.title': 'Cycle Interval',
+        'interval.30sec': '30 sec',
+        'interval.1min': '1 min',
+        'interval.3min': '3 min',
+        'interval.5min': '5 min',
+        'interval.15min': '15 min',
+        'interval.30min': '30 min',
+        'interval.1hour': '1 hour',
+
+        // Framework / Agent Chatroom
+        'framework.chatroom.title': '🤖 Agent Chatroom',
+        'framework.cycle': 'Cycle #0',
+        'framework.agent.config': 'Agent Config',
+        'framework.llm.toggle': 'LLM: OFF',
+
+        // LLM Metrics
+        'llm.metrics.title': 'LLM API',
+        'llm.metrics.tokens': 'Tokens (IN/OUT)',
+        'llm.metrics.total': 'Tokens Total',
+        'llm.metrics.speed': 'Token Speed',
+        'llm.metrics.latency': 'Latency (min/avg/max)',
+
         // Main Sections
         'section.kline': '📉 Real-time K-Line',
         'section.netvalue': '📈 Net Value Curve',
@@ -36,6 +70,7 @@ const i18n = {
         // Account Summary (Condensed)
         'account.initial_balance': 'Initial Balance',
         'account.current_balance': 'Current Balance',
+        'account.balance': 'Wallet Balance',
         'account.pnl_amount': 'PnL Amount',
         'account.pnl_pct': 'PnL %',
 
@@ -106,6 +141,17 @@ const i18n = {
         'settings.tab.trading': 'Trading',
         'settings.tab.strategy': 'Strategy',
         'settings.save': 'Save Changes',
+        'settings.trading.mode': 'Trading Mode',
+        'settings.binance.key': 'Binance API Key',
+        'settings.binance.secret': 'Binance Secret Key',
+        'settings.llm.provider': 'LLM Provider',
+        'settings.accounts.title': 'Trading Accounts',
+        'settings.accounts.refresh': 'Refresh',
+        'settings.accounts.add': 'Add Account',
+        'settings.accounts.testnet': 'Testnet Mode',
+        'settings.accounts.note': 'Note: Set API keys in .env with format: ACCOUNT_{ID}_API_KEY',
+        'settings.restart.note': 'Requires restart to apply change.',
+        'settings.accounts.addbtn': 'Add Account',
 
         // Trading Config
         'config.mode': 'Trading Mode',
@@ -384,6 +430,40 @@ const i18n = {
         'btn.pause': '暂停交易',
         'btn.stop': '停止系统',
 
+        // Mode Toggle
+        'mode.test': '🧪 测试',
+        'mode.test.title': '测试模式 - 不进行真实交易',
+        'mode.live': '💰 实盘',
+        'mode.live.title': '实盘模式 - 真实交易',
+
+        // Control Buttons
+        'btn.start.title': '开始交易',
+        'btn.pause.title': '暂停交易',
+        'btn.stop.title': '停止系统',
+
+        // Cycle Interval
+        'interval.title': '周期间隔',
+        'interval.30sec': '30秒',
+        'interval.1min': '1分钟',
+        'interval.3min': '3分钟',
+        'interval.5min': '5分钟',
+        'interval.15min': '15分钟',
+        'interval.30min': '30分钟',
+        'interval.1hour': '1小时',
+
+        // Framework / Agent Chatroom
+        'framework.chatroom.title': '🤖 Agent 聊天室',
+        'framework.cycle': '周期 #0',
+        'framework.agent.config': 'Agent 配置',
+        'framework.llm.toggle': 'LLM: OFF',
+
+        // LLM Metrics
+        'llm.metrics.title': 'LLM API',
+        'llm.metrics.tokens': 'Tokens (输入/输出)',
+        'llm.metrics.total': 'Tokens 总数',
+        'llm.metrics.speed': 'Token 速度',
+        'llm.metrics.latency': '延迟 (最小/平均/最大)',
+
         // Main Sections
         'section.kline': '📉 实时K线',
         'section.netvalue': '📈 净值曲线',
@@ -405,6 +485,7 @@ const i18n = {
         // Account Summary (Condensed)
         'account.initial_balance': '初始金额',
         'account.current_balance': '当前余额',
+        'account.balance': '钱包余额',
         'account.pnl_amount': '盈亏金额',
         'account.pnl_pct': '盈亏比例',
 
@@ -475,6 +556,17 @@ const i18n = {
         'settings.tab.trading': '交易',
         'settings.tab.strategy': '策略',
         'settings.save': '保存更改',
+        'settings.trading.mode': '交易模式',
+        'settings.binance.key': 'Binance API 密钥',
+        'settings.binance.secret': 'Binance Secret 密钥',
+        'settings.llm.provider': 'LLM 提供商',
+        'settings.accounts.title': '交易账户',
+        'settings.accounts.refresh': '刷新',
+        'settings.accounts.add': '添加账户',
+        'settings.accounts.testnet': 'Testnet 模式',
+        'settings.accounts.note': '注意：在 .env 中设置 API 密钥，格式：ACCOUNT_{ID}_API_KEY',
+        'settings.restart.note': '需要重启以应用更改',
+        'settings.accounts.addbtn': '添加账户',
 
         // Trading Config
         'config.mode': '交易模式',

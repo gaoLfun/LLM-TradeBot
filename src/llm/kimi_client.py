@@ -15,6 +15,6 @@ class KimiClient(OpenAIClient):
     使用 Moonshot 平台的 OpenAI 兼容接口。
     """
 
-    DEFAULT_BASE_URL = "https://api.moonshot.ai/v1"
-    DEFAULT_MODEL = "moonshot-v1-8k"
+    DEFAULT_BASE_URL = "https://api.moonshot.cn/v1"
+    DEFAULT_MODEL = "kimi-k2.5"
     PROVIDER = "kimi"

@@ -15,6 +15,6 @@ class MiniMaxClient(OpenAIClient):
     使用 MiniMax 平台的 OpenAI 兼容接口。
     """
 
-    DEFAULT_BASE_URL = "https://api.minimax.io/v1"
-    DEFAULT_MODEL = "MiniMax-M2.1"
+    DEFAULT_BASE_URL = "https://api.minimaxi.com/v1/"
+    DEFAULT_MODEL = "MiniMax-M2.7-highspeed"
     PROVIDER = "minimax"

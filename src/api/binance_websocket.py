@@ -167,6 +167,10 @@ class BinanceWebSocketManager:
         with self._cache_lock:
             return len(self.kline_cache.get(timeframe, deque()))
     
+    def is_running(self) -> bool:
+        """检查 WebSocket 是否正在运行"""
+        return self._is_running and self.ws_manager is not None
+    
     def is_ready(self, timeframe: str, min_klines: int = 100) -> bool:
         """
         检查缓存是否已准备好
@@ -179,6 +183,13 @@ class BinanceWebSocketManager:
             True if cache has enough data
         """
         return self.get_cache_size(timeframe) >= min_klines
+    
+    def restart(self):
+        """重启 WebSocket 连接（用于断线重连）"""
+        log.info(f"🔄 重启 WebSocket: {self.symbol}")
+        self.stop()
+        time.sleep(1)  # 等待资源释放
+        self.start()
     
     def stop(self):
         """停止 WebSocket 连接"""

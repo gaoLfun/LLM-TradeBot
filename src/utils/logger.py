@@ -21,6 +21,13 @@ class ColoredLogger:
     
     def llm_input(self, message: str, context: str = None):
         """记录 LLM 输入（青色背景）"""
+        # 清理 XML 标签避免 rich 解析错误
+        def clean_text(text):
+            import re
+            text = re.sub(r'<think[\s>][^<]*</think>', '', text, flags=re.DOTALL)
+            text = re.sub(r'</?[a-zA-Z][^>]*>', '', text)
+            return text
+        
         self._logger.opt(colors=True).info(
             f"<bold><cyan>{'=' * 60}</cyan></bold>\n"
             f"<bold><cyan>🤖 LLM 输入</cyan></bold>\n"
@@ -32,6 +39,7 @@ class ColoredLogger:
                 display_context = context[:2000] + "\n... (省略中间部分) ...\n" + context[-2000:]
             else:
                 display_context = context
+            display_context = clean_text(display_context)
             self._logger.opt(colors=True).info(f"<cyan>{display_context}</cyan>")
         self._logger.opt(colors=True).info(f"<bold><cyan>{'=' * 60}</cyan></bold>\n")
     

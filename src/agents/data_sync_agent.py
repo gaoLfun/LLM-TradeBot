@@ -166,7 +166,8 @@ class DataSyncAgent:
                 use_rest_fallback = True
             else:
                 # 仍需异步获取外部数据
-                q_data = await quant_client.fetch_coin_data(symbol)
+                loop = asyncio.get_event_loop()
+                q_data = await loop.run_in_executor(None, quant_client.fetch_coin_data, symbol)
                 # [DISABLE OI] Commented out due to API errors
                 # b_funding, b_oi = await asyncio.gather(
                 #     loop.run_in_executor(None, self.client.get_funding_rate_with_cache, symbol),
@@ -185,7 +186,8 @@ class DataSyncAgent:
             k1h = await self._fetch_with_cache(symbol_key, '1h', limit)
             
             # Fetch external data concurrently
-            q_data = await quant_client.fetch_coin_data(symbol)
+            loop = asyncio.get_event_loop()
+            q_data = await loop.run_in_executor(None, quant_client.fetch_coin_data, symbol)
             b_funding = await loop.run_in_executor(
                 None,
                 self.client.get_funding_rate_with_cache,

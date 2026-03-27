@@ -16,5 +16,5 @@ class QwenClient(OpenAIClient):
     """
     
     DEFAULT_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
-    DEFAULT_MODEL = "qwen-turbo"
+    DEFAULT_MODEL = "qwen-plus"
     PROVIDER = "qwen"

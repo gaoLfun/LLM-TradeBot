@@ -10,7 +10,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;600&display=swap"
         rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <script src="./i18n.js"></script>
 </head>
 
@@ -47,11 +47,11 @@
                 <div class="controls">
                     <!-- Mode Toggle: Test / Live -->
                     <div class="mode-toggle-container">
-                        <button id="btn-mode-test" class="mode-toggle-btn active" title="Test Mode - No Real Trading">
-                            🧪 Test
+                        <button id="btn-mode-test" class="mode-toggle-btn active" title="Test Mode - No Real Trading" data-i18n-title="mode.test.title">
+                            <span data-i18n="mode.test">🧪 Test</span>
                         </button>
-                        <button id="btn-mode-live" class="mode-toggle-btn" title="Live Mode - Real Trading">
-                            💰 Live
+                        <button id="btn-mode-live" class="mode-toggle-btn" title="Live Mode - Real Trading" data-i18n-title="mode.live.title">
+                            <span data-i18n="mode.live">💰 Live</span>
                         </button>
                     </div>
 
@@ -82,21 +82,21 @@
                         <span id="lang-text" class="settings-text">中文</span>
                     </button>
 
-                    <button id="btn-start" class="btn-control start" title="Start Trading"
+                    <button id="btn-start" class="btn-control start" title="Start Trading" data-i18n-title="btn.start.title"
                         onclick="if(window.setControl) window.setControl('start');">▶</button>
-                    <button id="btn-pause" class="btn-control pause" title="Pause Trading"
+                    <button id="btn-pause" class="btn-control pause" title="Pause Trading" data-i18n-title="btn.pause.title"
                         onclick="if(window.setControl) window.setControl('pause');">⏸</button>
-                    <button id="btn-stop" class="btn-control stop" title="Stop System"
+                    <button id="btn-stop" class="btn-control stop" title="Stop System" data-i18n-title="btn.stop.title"
                         onclick="if(window.setControl) window.setControl('stop');">⏹</button>
 
-                    <select id="interval-selector" class="interval-selector" title="Cycle Interval">
-                        <option value="0.5">30 sec</option>
-                        <option value="1">1 min</option>
-                        <option value="3" selected>3 min</option>
-                        <option value="5">5 min</option>
-                        <option value="15">15 min</option>
-                        <option value="30">30 min</option>
-                        <option value="60">1 hour</option>
+                    <select id="interval-selector" class="interval-selector" title="Cycle Interval" data-i18n-title="interval.title">
+                        <option value="0.5" data-i18n="interval.30sec">30 sec</option>
+                        <option value="1" data-i18n="interval.1min">1 min</option>
+                        <option value="3" data-i18n="interval.3min">3 min</option>
+                        <option value="5" selected data-i18n="interval.5min">5 min</option>
+                        <option value="15" data-i18n="interval.15min">15 min</option>
+                        <option value="30" data-i18n="interval.30min">30 min</option>
+                        <option value="60" data-i18n="interval.1hour">1 hour</option>
                     </select>
                 </div>
                 <div class="status-item">
@@ -138,7 +138,7 @@
                             </div>
                             <div class="positions-list-container">
                                 <div id="position-details" class="position-details-list">
-                                    <span class="empty-msg">No active positions</span>
+                                    <span class="empty-msg" data-i18n="position.none">无持仓</span>
                                 </div>
                             </div>
 
@@ -160,21 +160,21 @@
 
                             <!-- LLM Metrics -->
                             <div class="account-stats-compact llm-metrics-panel">
-                                <div class="stats-section-title">LLM API</div>
+                                <div class="stats-section-title" data-i18n="llm.metrics.title">LLM API</div>
                                 <div class="stat-row">
-                                    <span class="label">Tokens (IN/OUT)</span>
+                                    <span class="label" data-i18n="llm.metrics.tokens">Tokens (IN/OUT)</span>
                                     <span id="llm-metrics-tokens" class="value">--/--</span>
                                 </div>
                                 <div class="stat-row">
-                                    <span class="label">Tokens Total</span>
+                                    <span class="label" data-i18n="llm.metrics.total">Tokens Total</span>
                                     <span id="llm-metrics-total" class="value">--</span>
                                 </div>
                                 <div class="stat-row">
-                                    <span class="label">Token Speed</span>
+                                    <span class="label" data-i18n="llm.metrics.speed">Token Speed</span>
                                     <span id="llm-metrics-speed" class="value">-- tps</span>
                                 </div>
                                 <div class="stat-row">
-                                    <span class="label">Latency (min/avg/max)</span>
+                                    <span class="label" data-i18n="llm.metrics.latency">Latency (min/avg/max)</span>
                                     <span id="llm-metrics-latency" class="value">--/--/-- ms</span>
                                 </div>
                             </div>
@@ -187,12 +187,11 @@
                     <div class="glass-panel card agent-framework-card hero-chatroom-card">
                         <div class="card-header framework-header">
                             <div class="framework-title-block">
-                                <h2 class="framework-title">🤖 Agent Chatroom</h2>
-                                <p class="framework-subtitle" data-i18n="framework.subtitle">Strategic Debate & Decision
-                                    Hub</p>
+                                <h2 class="framework-title" data-i18n="framework.chatroom.title">🤖 Agent Chatroom</h2>
+                                <p class="framework-subtitle" data-i18n="framework.subtitle">Strategic Debate & Decision Hub</p>
                             </div>
                             <div class="framework-controls">
-                                <span id="framework-cycle" class="cycle-badge">Cycle #0</span>
+                                <span id="framework-cycle" class="cycle-badge" data-i18n="framework.cycle">Cycle #0</span>
                                 <span id="current-symbol-display" class="current-symbol-badge">
                                     📊 <span id="symbol-display-text">--</span>
                                 </span>
@@ -200,9 +199,8 @@
                                     style="background: rgba(0, 255, 157, 0.1); border-color: rgba(0, 255, 157, 0.3); display: none;">
                                     🤖 <span id="llm-provider-text">--</span> (<span id="llm-model-text">--</span>)
                                 </div>
-                                <button id="btn-view-prompts" class="llm-toggle-btn" type="button"
-                                    style="margin-right: 5px;">Agent Config</button>
-                                <button id="btn-llm-toggle" class="llm-toggle-btn" type="button">LLM: OFF</button>
+                                <button id="btn-view-prompts" class="llm-toggle-btn" type="button" data-i18n="framework.agent.config" style="margin-right: 5px;">Agent Config</button>
+                                <button id="btn-llm-toggle" class="llm-toggle-btn" type="button" data-i18n="framework.llm.toggle">LLM: OFF</button>
                             </div>
                         </div>
                         <div class="chatroom-container hero-scroller">
@@ -225,14 +223,14 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Symbol</th>
-                                        <th class="text-right">PnL</th>
-                                        <th class="text-right">Win%</th>
+                                        <th data-i18n="table.symbol">Symbol</th>
+                                        <th class="text-right" data-i18n="table.pnl">PnL ($)</th>
+                                        <th class="text-right" data-i18n="table.win_rate">Win Rate</th>
                                     </tr>
                                 </thead>
                                 <tbody id="symbol-ranking-body">
                                     <tr>
-                                        <td colspan="4" class="text-center">Loading...</td>
+                                        <td colspan="4" class="text-center" data-i18n="common.loading">Loading...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -272,36 +270,35 @@
     <div id="settings-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content settings-modal">
             <div class="modal-header">
-                <h3>⚙️ Settings</h3>
+                <h3 data-i18n="settings.title">⚙️ Settings</h3>
                 <button id="close-settings" class="btn-close">×</button>
             </div>
 
             <div class="settings-tabs">
-                <button class="tab-btn active" data-tab="tab-keys">API Keys</button>
-                <button class="tab-btn" data-tab="tab-accounts">Accounts</button>
+                <button class="tab-btn active" data-tab="tab-keys" data-i18n="settings.tab.keys">API Keys</button>
+                <button class="tab-btn" data-tab="tab-accounts" data-i18n="settings.tab.accounts">Accounts</button>
             </div>
 
             <div class="settings-body">
                 <!-- Tab: API Keys -->
                 <div id="tab-keys" class="tab-pane active">
                     <div class="form-group">
-                        <label>Trading Mode</label>
+                        <label data-i18n="settings.trading.mode">Trading Mode</label>
                         <select id="cfg-run-mode" class="form-control" style="border-color: #ecc94b;">
-                            <option value="test">Test Mode (Paper Trading)</option>
-                            <option value="live">Live Trading (Real Money)</option>
+                            <option value="test" data-i18n="config.mode.test">Test Mode (Paper Trading)</option>
+                            <option value="live" data-i18n="config.mode.live">Live Trading (Real Money)</option>
                         </select>
-                        <p style="color: #a0aec0; font-size: 0.8em; margin-top: 4px;">Requires restart to apply change.
-                        </p>
+                        <p style="color: #a0aec0; font-size: 0.8em; margin-top: 4px;" data-i18n="settings.restart.note">Requires restart to apply change.</p>
                     </div>
 
                     <div id="binance-config-section">
                         <div class="form-group">
-                            <label>Binance API Key</label>
+                            <label data-i18n="settings.binance.key">Binance API Key</label>
                             <input type="password" id="cfg-binance-key" class="form-control"
                                 placeholder="Saved (Hidden)">
                         </div>
                         <div class="form-group">
-                            <label>Binance Secret Key</label>
+                            <label data-i18n="settings.binance.secret">Binance Secret Key</label>
                             <input type="password" id="cfg-binance-secret" class="form-control"
                                 placeholder="Saved (Hidden)">
                         </div>
@@ -310,7 +307,7 @@
 
                     <!-- LLM Provider Selection -->
                     <div class="form-group">
-                        <label>🤖 LLM Provider</label>
+                        <label data-i18n="settings.llm.provider">🤖 LLM Provider</label>
                         <select id="cfg-llm-provider" class="form-control" style="border-color: #00ff9d;">
                             <option value="none">None (No LLM)</option>
                             <option value="deepseek">DeepSeek (Default)</option>
@@ -384,8 +381,8 @@
                         <label>MiniMax API Key</label>
                         <input type="password" id="cfg-minimax-key" class="form-control" placeholder="Saved (Hidden)">
                         <p style="color: #718096; font-size: 0.7em; margin-top: 2px;">Get key: <a
-                                href="https://platform.minimax.io" target="_blank"
-                                style="color: #00ff9d">platform.minimax.io</a></p>
+                                href="https://api.minimaxi.com/v1" target="_blank"
+                                style="color: #00ff9d">https://api.minimaxi.com/v1</a></p>
                     </div>
 
                     <!-- GLM API Key -->
@@ -403,21 +400,20 @@
                     <div class="form-group">
                         <div
                             style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-                            <label style="margin:0;">📊 Trading Accounts</label>
+                            <label style="margin:0;" data-i18n="settings.accounts.title">📊 Trading Accounts</label>
                             <button id="btn-refresh-accounts" class="btn-sm"
-                                style="background:#2d3748;color:white;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;">🔄
-                                Refresh</button>
+                                style="background:#2d3748;color:white;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;" data-i18n="settings.accounts.refresh">🔄 Refresh</button>
                         </div>
                         <div id="accounts-list"
                             style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 4px; min-height: 100px; max-height: 200px; overflow-y: auto;">
-                            <p style="color: #718096; text-align: center;">Loading accounts...</p>
+                            <p style="color: #718096; text-align: center;" data-i18n="common.loading">Loading accounts...</p>
                         </div>
                     </div>
 
                     <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 0;">
 
                     <div class="form-group">
-                        <label>➕ Add New Account</label>
+                        <label data-i18n="settings.accounts.add">➕ Add New Account</label>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                             <input type="text" id="new-account-id" class="form-control"
                                 placeholder="Account ID (e.g. sub-account-1)">
@@ -429,20 +425,18 @@
                             </select>
                             <label style="display:flex; align-items:center; cursor:pointer;">
                                 <input type="checkbox" id="new-account-testnet" checked style="margin-right: 8px;">
-                                <span>Testnet Mode</span>
+                                <span data-i18n="settings.accounts.testnet">Testnet Mode</span>
                             </label>
                         </div>
                         <button id="btn-add-account"
-                            style="margin-top: 10px; background: #00ff9d; color: #1a202c; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">Add
-                            Account</button>
-                        <p style="color: #a0aec0; font-size: 0.75em; margin-top: 8px;">Note: Set API keys in .env with
-                            format: ACCOUNT_{ID}_API_KEY</p>
+                            style="margin-top: 10px; background: #00ff9d; color: #1a202c; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;" data-i18n="settings.accounts.addbtn">Add Account</button>
+                        <p style="color: #a0aec0; font-size: 0.75em; margin-top: 8px;" data-i18n="settings.accounts.note">Note: Set API keys in .env with format: ACCOUNT_{ID}_API_KEY</p>
                     </div>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button id="btn-save-settings" class="btn btn-primary">Save Changes</button>
+                <button id="btn-save-settings" class="btn btn-primary" data-i18n="settings.save">Save Changes</button>
             </div>
         </div>
     </div>

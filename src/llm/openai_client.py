@@ -17,8 +17,12 @@ class OpenAIClient(BaseLLMClient):
     """
     
     DEFAULT_BASE_URL = "https://api.openai.com/v1"
-    DEFAULT_MODEL = "gpt-4o"
+    DEFAULT_MODEL = "gpt-4.1"
     PROVIDER = "openai"
+    
+    def _build_url(self) -> str:
+        """OpenAI 兼容 API 使用 /chat/completions 端点"""
+        return f"{self.base_url}/chat/completions"
     
     def _build_headers(self) -> Dict[str, str]:
         """构建 OpenAI 认证头"""

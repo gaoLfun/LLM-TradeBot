@@ -170,8 +170,13 @@ class MultiAgentTradingBot:
             take_profit_pct: 止盈百分比
             test_mode: 测试模式（不执行真实交易）
         """
+        # 获取当前 LLM Provider 用于显示
+        temp_config = Config()
+        llm_provider = temp_config.llm.get('provider') or os.getenv('LLM_PROVIDER', 'minimax')
+        llm_provider_display = llm_provider.upper() if llm_provider else 'MINIMAX'
+        
         print("\n" + "="*80)
-        print(f"🤖 AI Trader - DeepSeek LLM Decision Mode ({VERSION})")
+        print(f"🤖 AI Trader - {llm_provider_display} LLM Decision Mode ({VERSION})")
         print("="*80)
         
         self.config = Config()
@@ -361,14 +366,15 @@ class MultiAgentTradingBot:
         print("  ✅ QuantAnalystAgent ready")
         print("  ✅ RiskAuditAgent ready")
         
-        # 🧠 DeepSeek 决策引擎
+        # 🧠 LLM 决策引擎
         print("[DEBUG] Creating StrategyEngine...")
         self.strategy_engine = StrategyEngine()
         print("[DEBUG] StrategyEngine created")
+        provider_name = getattr(self.strategy_engine, 'provider', 'LLM').upper()
         if self.strategy_engine.is_ready:
-            print("  ✅ DeepSeek StrategyEngine ready")
+            print(f"  ✅ {provider_name} StrategyEngine ready")
         else:
-            print("  ⚠️ DeepSeek StrategyEngine not ready (Awaiting API Key)")
+            print(f"  ⚠️ {provider_name} StrategyEngine not ready (Awaiting API Key)")
             
         # 🆕 Optional Agent: ReflectionAgent
         self.reflection_agent = None
@@ -1776,9 +1782,11 @@ class MultiAgentTradingBot:
         elif not forced_exit:
             if llm_enabled:
                 if not (hasattr(self, '_headless_mode') and self._headless_mode):
-                    print("[Step 3/5] 🧠 DeepSeek LLM - Making decision...")
+                    provider_name = getattr(self.strategy_engine, 'provider', 'LLM').upper()
+                    print(f"[Step 3/5] 🧠 {provider_name} LLM - Making decision...")
 
-                global_state.add_agent_message("decision_core", "🧠 DeepSeek LLM is weighing options...", level="info")
+                provider_name = getattr(self.strategy_engine, 'provider', 'LLM').upper()
+                global_state.add_agent_message("decision_core", f"🧠 {provider_name} LLM is weighing options...", level="info")
 
                 market_context_text = self._build_market_context(
                     quant_analysis=quant_analysis,
@@ -1958,8 +1966,9 @@ class MultiAgentTradingBot:
         q_sent = quant_analysis.get('sentiment', {})
         q_comp = quant_analysis.get('comprehensive', {})
 
+        provider_key = getattr(self.strategy_engine, 'provider', 'llm').lower()
         vote_details = {
-            'deepseek': decision_payload.get('confidence', 0),
+            provider_key: decision_payload.get('confidence', 0),
             'strategist_total': q_comp.get('score', 0),
             'trend_1h': q_trend.get('trend_1h_score', 0),
             'trend_15m': q_trend.get('trend_15m_score', 0),
@@ -1998,7 +2007,7 @@ class MultiAgentTradingBot:
             weighted_score=decision_payload.get('confidence', 0) - 50,
             vote_details=vote_details,
             multi_period_aligned=True,
-            reason=decision_payload.get('reasoning', 'DeepSeek LLM decision'),
+            reason=decision_payload.get('reasoning', f'{provider_key.upper()} LLM decision'),
             regime={
                 'regime': regime_desc,
                 'confidence': decision_payload.get('confidence', 0)
@@ -4520,7 +4529,7 @@ class MultiAgentTradingBot:
         if open_trade:
             hold_cycles = self._get_holding_cycles(open_trade)
             if hold_cycles is not None:
-                cycle_interval = max(1, int(getattr(global_state, 'cycle_interval', 3) or 3))
+                cycle_interval = max(1, int(getattr(global_state, 'cycle_interval', 5) or 5))
                 hold_minutes = hold_cycles * cycle_interval
                 return hold_minutes / 60.0
         if self.test_mode:
@@ -4553,7 +4562,7 @@ class MultiAgentTradingBot:
         if max_hold_cycles is None:
             max_hold_cycles = 180
         if max_hold_hours is None and hold_cycles is not None:
-            cycle_interval = max(1, int(getattr(global_state, 'cycle_interval', 3) or 3))
+            cycle_interval = max(1, int(getattr(global_state, 'cycle_interval', 5) or 5))
             max_hold_hours = (max_hold_cycles * cycle_interval) / 60.0
         hold_tag = f"{hold_hours:.1f}h" if hold_hours is not None else "n/a"
 
@@ -4979,7 +4988,7 @@ class MultiAgentTradingBot:
         selected_agent_outputs: Optional[Dict] = None
     ) -> str:
         """
-        构建 DeepSeek LLM 所需的市场上下文文本
+        构建 LLM 决策所需的市场上下文文本
         """
         # 提取关键数据
         current_price = market_data['current_price']
@@ -5245,7 +5254,7 @@ class MultiAgentTradingBot:
         stats = {
             'risk_audit': self.risk_audit.get_audit_report(),
         }
-        # DeepSeek 模式下没有 decision_core
+        # StrategyEngine 没有 decision_core
         if hasattr(self, 'strategy_engine'):
             # self.strategy_engine 目前没有 get_statistics 方法，但可以返回基本信息
             stats['strategy_engine'] = {
@@ -5919,12 +5928,11 @@ def main():
     # ==============================================================================
     
     # 根据部署模式设置默认周期间隔
-    # Local: 1 分钟 (开发测试用)
-    # Railway: 5 分钟 (生产环境)
+    # Local/Railway: 5 分钟 (统一使用5分钟)
     if args.interval == 3.0:  # 如果用户没有通过 CLI 指定间隔
         if DEPLOYMENT_MODE == 'local':
-            args.interval = 1.0
-            print(f"🏠 Local mode: Cycle interval set to 1 minute")
+            args.interval = 5.0
+            print(f"🏠 Local mode: Cycle interval set to 5 minutes")
         else:
             args.interval = 5.0
             print(f"☁️ Railway mode: Cycle interval set to 5 minutes")

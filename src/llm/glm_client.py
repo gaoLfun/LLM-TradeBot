@@ -16,5 +16,5 @@ class GLMClient(OpenAIClient):
     """
 
     DEFAULT_BASE_URL = "https://open.bigmodel.cn/api/paas/v4"
-    DEFAULT_MODEL = "glm-4-flash"
+    DEFAULT_MODEL = "glm-4-plus"
     PROVIDER = "glm"

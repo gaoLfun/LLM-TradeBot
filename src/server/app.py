@@ -29,10 +29,14 @@ import shutil
 
 app = FastAPI(title="LLM-TradeBot Dashboard")
 
-# Enable CORS (rest unchanged)
+# CORS Configuration - support custom origins via environment variable
+# When using credentials, must specify explicit origins (not "*")
+_cors_origins = os.environ.get("CORS_ORIGINS", "*").split(",")
+_cors_origins = [o.strip() for o in _cors_origins if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins if _cors_origins else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -51,15 +55,40 @@ IS_RAILWAY = bool(os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("RAILW
 IS_PRODUCTION = IS_RAILWAY or os.environ.get("DEPLOYMENT_MODE", "local") != "local"
 
 SESSION_COOKIE_NAME = "tradebot_session"
-# Session store: {session_id: role} where role is 'admin' or 'user'
-VALID_SESSIONS = {}
+# Session store: {session_id: (role, expiry_timestamp)}
+VALID_SESSIONS: Dict[str, tuple] = {}
+SESSION_MAX_AGE = 86400 * 7  # 7 days in seconds
+
+def _cleanup_expired_sessions():
+    """清理过期的 session"""
+    import time
+    current_time = time.time()
+    expired = [sid for sid, (_, expiry) in VALID_SESSIONS.items() if current_time > expiry]
+    for sid in expired:
+        del VALID_SESSIONS[sid]
+    if expired:
+        print(f"[Auth] Cleaned up {len(expired)} expired sessions")
 
 def verify_auth(request: Request):
     """Dependency to verify login and return role"""
+    import time
+    
+    # 定期清理过期 session (1% 概率触发)
+    import random
+    if random.random() < 0.01:
+        _cleanup_expired_sessions()
+    
     session_id = request.cookies.get(SESSION_COOKIE_NAME)
     if not session_id or session_id not in VALID_SESSIONS:
         raise HTTPException(status_code=401, detail="Unauthorized")
-    return VALID_SESSIONS[session_id]  # Return 'admin' or 'user'
+    
+    role, expiry = VALID_SESSIONS[session_id]
+    if time.time() > expiry:
+        # Session 已过期
+        del VALID_SESSIONS[session_id]
+        raise HTTPException(status_code=401, detail="Session expired")
+    
+    return role  # Return 'admin' or 'user'
 
 def verify_admin(role: str = Depends(verify_auth)):
     """Dependency to enforce Admin access"""
@@ -88,42 +117,39 @@ async def get_system_info():
         "requires_auth": True
     }
 
-# Public endpoint to prefill login (admin) password
-@app.get("/api/login/default")
-async def get_default_login():
-    # Railway default should always prefill EthanAlgoX
-    if IS_RAILWAY:
-        return {"password": "EthanAlgoX"}
-    # Local: if WEB_PASSWORD is not set, fall back to EthanAlgoX
-    return {"password": WEB_PASSWORD or "EthanAlgoX"}
-
 # Authentication Endpoints
 @app.post("/api/login")
-async def login(response: Response, data: LoginRequest):
+async def login(response: Response, request: Request, data: LoginRequest):
     role = None
     password = (data.password or "").strip()
     
-    # Universal Login Logic (Robust for both Local and Railway)
-    # 1. Admin Login: Password matches WEB_PASSWORD or hardcoded known admin passwords
-    if (WEB_PASSWORD and password == WEB_PASSWORD) or password == "admin" or password == "EthanAlgoX":
+    # Universal Login Logic
+    # Only accept WEB_PASSWORD from environment variable (no hardcoded defaults)
+    if WEB_PASSWORD and password == WEB_PASSWORD:
         role = 'admin'
-    # 2. No guest/read-only mode: any non-admin password is invalid
     elif not WEB_PASSWORD and password == "":
-        # If no WEB_PASSWORD is configured, allow empty password as admin
-        role = 'admin'
+        # If no WEB_PASSWORD is configured, require non-empty password for security
+        raise HTTPException(status_code=401, detail="WEB_PASSWORD not configured. Please set WEB_PASSWORD environment variable.")
 
     if role:
         session_id = secrets.token_urlsafe(32)
-        VALID_SESSIONS[session_id] = role
+        import time
+        expiry = time.time() + SESSION_MAX_AGE
+        VALID_SESSIONS[session_id] = (role, expiry)
         
-        # Cookie settings for both local (HTTP) and Railway (HTTPS) deployment
+        # Detect if request is HTTPS (supports reverse proxy with HTTPS termination)
+        # Check X-Forwarded-Proto header (set by Nginx/Caddy) or direct HTTPS
+        forwarded_proto = request.headers.get("x-forwarded-proto", "http").lower()
+        is_https = forwarded_proto == "https" or request.url.scheme == "https"
+        
+        # Cookie settings: secure only if actual HTTPS connection
         response.set_cookie(
             key=SESSION_COOKIE_NAME, 
             value=session_id, 
             httponly=True, 
             max_age=86400 * 7,  # 7 days
-            samesite="none" if IS_PRODUCTION else "lax",  # "none" required for cross-site HTTPS
-            secure=IS_PRODUCTION  # Must be True for HTTPS (Railway)
+            samesite="none" if (IS_PRODUCTION and is_https) else "lax",
+            secure=is_https  # Only set Secure flag if actually using HTTPS
         )
         return {"status": "success", "role": role}
     else:

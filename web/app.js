@@ -36,6 +36,14 @@ function applyTranslations(lang) {
             el.textContent = icon ? icon[0] + ' ' + translation.replace(/^[🌐⚙️🚪📉📈📋📜📡⏹️⏸️▶️🧪💰📊]\s*/u, '') : translation;
         }
     });
+
+    // Also handle title attributes for tooltips
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        if (window.i18n[lang][key]) {
+            el.title = window.i18n[lang][key];
+        }
+    });
 }
 
 function getI18n(key, fallback = '') {
@@ -1452,14 +1460,14 @@ function renderSystemStatus(system) {
         cycleEl.textContent = `#${system.cycle_counter}`;
     }
 
-    // Sync Interval Selector with backend value (default to 3 min)
+    // Sync Interval Selector with backend value (default to 5 min)
     const intervalSel = document.getElementById('interval-selector');
     if (intervalSel) {
         // The instruction provided a syntactically incorrect line.
         // Assuming the intent was to keep the original logic for setting the interval value,
         // and that the `<script>` tag was a misplaced artifact or a misunderstanding of JS syntax.
         // To maintain syntactic correctness as per instructions, the original line is kept.
-        const interval = system.cycle_interval !== undefined ? system.cycle_interval : 3;
+        const interval = system.cycle_interval !== undefined ? system.cycle_interval : 5;
         intervalSel.value = interval.toString();
     }
 
@@ -1625,7 +1633,10 @@ function updateAgentFramework(system, decision, agents) {
     // Update Cycle Number
     const cycleEl = document.getElementById('framework-cycle');
     if (cycleEl && system.cycle_counter !== undefined) {
-        cycleEl.textContent = `Cycle #${system.cycle_counter}`;
+        const cycleNum = system.cycle_counter;
+        const lang = window.currentLang || 'en';
+        const cycleText = getI18n('framework.cycle', 'Cycle #').replace('#0', '');
+        cycleEl.textContent = `${cycleText}#${cycleNum}`;
     }
 
     // Update Symbol Selector (already handled by updateSymbolSelector)

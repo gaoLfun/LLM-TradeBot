@@ -20,7 +20,7 @@ class ClaudeClient(BaseLLMClient):
     """
     
     DEFAULT_BASE_URL = "https://api.anthropic.com/v1"
-    DEFAULT_MODEL = "claude-3-5-sonnet-20241022"
+    DEFAULT_MODEL = "claude-sonnet-4-6"
     PROVIDER = "claude"
     
     ANTHROPIC_VERSION = "2023-06-01"

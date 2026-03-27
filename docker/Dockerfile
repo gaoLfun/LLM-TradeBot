@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     g++ \
     make \
     libpq-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
@@ -18,18 +19,18 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy application code (exclude docker and docs in build context)
 COPY . .
 
 # Create necessary directories
-RUN mkdir -p data logs models
+RUN mkdir -p data logs models data/kline data/live data/analytics data/execution data/agents data/risk
 
 # Expose port
 EXPOSE 8000
 
-# Health check
+# Health check using curl (always available)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000')" || exit 1
+    CMD curl -f http://localhost:8000/api/info || exit 1
 
-# Default command
-CMD ["python", "main.py", "--test", "--mode", "continuous"]
+# Default command - continuous mode
+CMD ["python", "main.py", "--mode", "continuous"]

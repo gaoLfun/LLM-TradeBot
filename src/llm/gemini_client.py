@@ -20,7 +20,7 @@ class GeminiClient(BaseLLMClient):
     """
     
     DEFAULT_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
-    DEFAULT_MODEL = "gemini-1.5-flash"
+    DEFAULT_MODEL = "gemini-2.0-flash"
     PROVIDER = "gemini"
     
     def _build_headers(self) -> Dict[str, str]:

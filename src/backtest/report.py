@@ -93,7 +93,7 @@ class BacktestReport:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LLM-TradeBot Backtest Report</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <style>
         :root {{
             --bg-primary: #0a0a0f;
