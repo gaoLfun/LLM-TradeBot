@@ -287,25 +287,17 @@ class StrategyEngine:
         if not self.is_ready or not self.client:
              return {"bullish_reasons": "LLM not ready", "bull_confidence": 50}
 
-        bull_prompt = """You are a BULLISH market analyst. Your job is to find reasons WHY the market could go UP.
+        bull_prompt = '''You are a BULLISH market analyst. Find reasons WHY the market could go UP.
 
-Analyze the provided 'Four-Layer Strategy Analysis' and identify:
-1. Bullish Trend & Fuel signals (Layer 1)
-2. Bullish AI Resonance (Layer 2)
-3. Bullish Setup patterns (Layer 3/4)
+STRICT OUTPUT FORMAT - RESPOND WITH ONLY THIS JSON, NOTHING ELSE:
+{"stance": "STRONGLY_BULLISH", "bullish_reasons": "reason 1; reason 2; reason 3", "bull_confidence": 75}
 
-Output your analysis in this EXACT JSON format:
-```json
-{
-  "stance": "STRONGLY_BULLISH",
-  "bullish_reasons": "Your 3-5 key bullish observations, separated by semicolons",
-  "bull_confidence": 75
-}
-```
-
-stance must be one of: STRONGLY_BULLISH, SLIGHTLY_BULLISH, NEUTRAL, UNCERTAIN
-bull_confidence should be 0-100 based on how strong the bullish case is.
-Focus ONLY on bullish factors. Ignore bearish signals."""
+Rules:
+- Output ONLY valid JSON starting with { and ending with }
+- stance values: STRONGLY_BULLISH, SLIGHTLY_BULLISH, NEUTRAL, or UNCERTAIN
+- bull_confidence: integer 0-100
+- bullish_reasons: 2-4 short bullish reasons separated by semicolons
+- NO thinking tags, NO explanations, NO markdown, ONLY JSON'''
 
         try:
             response = self.client.chat(
@@ -343,25 +335,17 @@ Focus ONLY on bullish factors. Ignore bearish signals."""
         if not self.is_ready or not self.client:
              return {"bearish_reasons": "LLM not ready", "bear_confidence": 50}
 
-        bear_prompt = """You are a BEARISH market analyst. Your job is to find reasons WHY the market could go DOWN.
+        bear_prompt = '''You are a BEARISH market analyst. Find reasons WHY the market could go DOWN.
 
-Analyze the provided 'Four-Layer Strategy Analysis' and identify:
-1. Bearish Trend & Fuel signals (Layer 1)
-2. Bearish AI Resonance (Layer 2)
-3. Bearish Setup patterns (Layer 3/4)
+STRICT OUTPUT FORMAT - RESPOND WITH ONLY THIS JSON, NOTHING ELSE:
+{"stance": "STRONGLY_BEARISH", "bearish_reasons": "reason 1; reason 2; reason 3", "bear_confidence": 75}
 
-Output your analysis in this EXACT JSON format:
-```json
-{
-  "stance": "STRONGLY_BEARISH",
-  "bearish_reasons": "Your 3-5 key bearish observations, separated by semicolons",
-  "bear_confidence": 60
-}
-```
-
-stance must be one of: STRONGLY_BEARISH, SLIGHTLY_BEARISH, NEUTRAL, UNCERTAIN
-bear_confidence should be 0-100 based on how strong the bearish case is.
-Focus ONLY on bearish factors. Ignore bullish signals."""
+Rules:
+- Output ONLY valid JSON starting with { and ending with }
+- stance values: STRONGLY_BEARISH, SLIGHTLY_BEARISH, NEUTRAL, or UNCERTAIN
+- bear_confidence: integer 0-100
+- bearish_reasons: 2-4 short bearish reasons separated by semicolons
+- NO thinking tags, NO explanations, NO markdown, ONLY JSON'''
 
 
         try:
@@ -373,6 +357,9 @@ Focus ONLY on bearish factors. Ignore bullish signals."""
             )
             
             content = response.content
+            
+            # DEBUG: Log raw response
+            log.info(f"[DEBUG] Bear Agent raw response: {content[:500]}")
             
             # Parse JSON from response using robust extraction
             result = _extract_json_robust(content)
