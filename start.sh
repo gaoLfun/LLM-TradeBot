@@ -122,4 +122,5 @@ print_success "Dashboard will be available at: http://localhost:8000"
 echo ""
 
 # Run main.py
-python main.py $MODE_FLAG $RUN_MODE_ARG $EXTRA_ARGS
+nohup python main.py $MODE_FLAG $RUN_MODE_ARG $EXTRA_ARGS > runoob.log 2>&1 &
+# python main.py $MODE_FLAG $RUN_MODE_ARG $EXTRA_ARGS
